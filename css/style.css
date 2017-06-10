@@ -1,0 +1,48 @@
+/*default font version*/
+@font-face {
+  font-family: 'lato';
+  src:
+    local('Lato Regular'),
+    Local('Lato-Regular'),
+    url('fonts/Lato-Regular.ttf')
+    format('truetype');
+}
+body {
+  margin: 0;
+  font-family: 'lato', sans-serif;
+  color: #ffffff;
+}
+#nav-bar {
+  display: -webkit-flex;
+  display: flex;
+  position: absolute;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 70px;
+  width: 100%;
+  background-color: #0A4F87;
+  opacity: 0.8;
+  box-shadow: 0 2px 4px #0A4F87;
+}
+#title {
+  margin-left: 15px;
+  font-size: 1.35em;
+}
+input[type=text] {
+  width: 270px;
+  height: 40px;
+  background-color: #FFFFFF;
+  opacity: 0.9;
+  border: 1px #4A4A4A;
+  border-radius: 2px;
+}
+input[type=text]::placeholder {
+  font-size: 1.35em;
+  color: #4A4A4A;
+  text-indent: 10px;
+}
+.right {
+  margin-left: auto;
+  margin-right: 15px;
+}
