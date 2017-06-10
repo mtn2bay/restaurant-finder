@@ -8,14 +8,20 @@
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
 <body>
-  <div id="nav-bar">
-    <div id="title">Where do you want to eat?</div>
-    <div class="right">
-      <form>
-        <input type="text" id="search" placeholder="e.g. Taqueria">
-      </form>
+  <div class="content">
+    <div id="nav-bar">
+      <div id="title">Where do you want to eat?</div>
+      <div class="right">
+        <form>
+          <input type="text" id="search" placeholder="e.g. Taqueria">
+        </form>
+      </div>
     </div>
-
+    <div id="map-container"></div>
   </div>
-</body>
+  <script type="text/javascript" src="js/app.js"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHn16vpqktMIXQH8ZbmemlPdTDjr4wJdY&callback=initMap">
+  </script>
+  </body>
 </html>
