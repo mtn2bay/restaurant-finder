@@ -7,6 +7,16 @@
     url('fonts/Lato-Regular.ttf')
     format('truetype');
 }
+/*bold font version*/
+@font-face {
+  font-family: 'lato';
+  src:
+    local('Lato Bold'),
+    Local('Lato-Bold'),
+    url('fonts/Lato-Bold.ttf')
+    format('truetype');
+  font-weight: bold;
+}
 html {
   height: 100%;
 }
@@ -14,7 +24,6 @@ body {
   height: 100%;
   margin: 0;
   font-family: 'lato', sans-serif;
-  color: #ffffff;
 }
 .content {
   position: relative;
@@ -31,12 +40,14 @@ body {
   height: 70px;
   width: 100%;
   background-color: #0A4F87;
-  opacity: 0.8;
+  opacity: 0.9;
   box-shadow: 0 2px 4px #0A4F87;
 }
 #title {
   margin-left: 15px;
-  font-size: 1.35em;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffffff;
 }
 input[type=text] {
   width: 270px;
@@ -45,9 +56,8 @@ input[type=text] {
   opacity: 0.9;
   border: 1px #4A4A4A;
   border-radius: 2px;
-}
-input[type=text]::placeholder {
-  font-size: 1.35em;
+  font-family: 'lato', sans-serif;
+  font-size: 18px;
   color: #4A4A4A;
   text-indent: 10px;
 }
