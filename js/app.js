@@ -1,3 +1,15 @@
+var restaurantList = [];
+var nextPage;
+
+// Constructor to hold data from Google Places API
+function RestaurantInfo(placeID, name, rating, price, photo) {
+  this.placeID = placeID;
+  this.name = name;
+  this.rating = rating;
+  this.price = price;
+  this.photo = photo;
+}
+
 
 // Text input functionality
 var searchBox = document.getElementById('search');
@@ -21,6 +33,8 @@ searchBox.addEventListener('keyup', function(event) {
 
 
 // AJAX call for PHP script
+// Recieve and parse data from Google Places API via PHP
+// Build an array of objects for each location
 function phpCall(keyword) {
   var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
 
@@ -30,7 +44,20 @@ function phpCall(keyword) {
 		data: ({url: url}),
 		success: function(data) {
       var results = JSON.parse(data);
-      console.log(results);
+
+      nextPage = results.next_page_token;
+
+      results = results.results;
+
+      for (var i = 0; i < results.length; i++) {
+        restaurantList[i] = new RestaurantInfo(results[i].place_id,
+          results[i].name, results[i].rating, results[i].price_level);
+
+        if (results[i].photos) {
+          restaurantList[i].RestaurantInfo = results[i].photos[0].html_attributions[0];
+        }
+      }
+      console.log(nextPage, restaurantList);
     }
 	})
 }
