@@ -1,9 +1,10 @@
 var restaurantList = [];
 var nextPage;
 
-// Constructor to hold data from Google Places API
-function RestaurantInfo(placeID, name, rating, price, photo) {
+// Constructor for data from Google Places API
+function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.placeID = placeID;
+  this.location = location;
   this.name = name;
   this.rating = rating;
   this.price = price;
@@ -44,13 +45,14 @@ function phpCall(keyword) {
 		data: ({url: url}),
 		success: function(data) {
       var results = JSON.parse(data);
+      console.log(results);
 
       nextPage = results.next_page_token;
 
       results = results.results;
 
       for (var i = 0; i < results.length; i++) {
-        restaurantList[i] = new RestaurantInfo(results[i].place_id,
+        restaurantList[i] = new RestaurantInfo(results[i].place_id, results[i].geometry.location,
           results[i].name, results[i].rating, results[i].price_level);
 
         if (results[i].photos) {
@@ -58,6 +60,11 @@ function phpCall(keyword) {
         }
       }
       console.log(nextPage, restaurantList);
+
+      for (var i = 0; i < restaurantList.length; i++) {
+        createMarker(restaurantList[i]);
+      }
+
     }
 	})
 }
@@ -88,20 +95,20 @@ function initMap() {
   // service.nearbySearch(request, callback);
 }
 
-function callback(results, status) {
-  if (status == google.maps.places.PlacesServiceStatus.OK) {
-    for (var i = 0; i < results.length; i++) {
-      var place = results[i]
-      createMarker(results[i]);
-    }
-  }
-}
+// function callback(results, status) {
+//   if (status == google.maps.places.PlacesServiceStatus.OK) {
+//     for (var i = 0; i < results.length; i++) {
+//       var place = results[i]
+//       createMarker(results[i]);
+//     }
+//   }
+// }
 
 function createMarker(place) {
-  var placeloc = place.geometry.location;
+  var location = place.location;
   var marker = new google.maps.Marker({
     map: map,
-    position: place.geometry.location
+    position: location
   });
 
   google.maps.event.addListener(marker, 'click', function() {
