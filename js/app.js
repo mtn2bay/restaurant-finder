@@ -1,5 +1,4 @@
-var restaurantList = [];
-var nextPage;
+var dataArray = [];
 
 // Constructor for data from Google Places API
 function RestaurantInfo(placeID, location, name, rating, price, photo) {
@@ -25,54 +24,63 @@ searchBox.addEventListener('blur', function(event) {
 searchBox.addEventListener('keyup', function(event) {
   event.preventDefault();
   if (event.keyCode == 13) {
-    userQuery = this.value;
+    var userQuery = this.value;
+
     this.value = '';
-    phpCall(userQuery);
+    phpCall(userQuery, '');
     activateMarkers = true;
   }
 });
 
-
 // AJAX call for PHP script
 // Recieve and parse data from Google Places API via PHP
 // Build an array of objects for each location
-function phpCall(keyword) {
-  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
+function phpCall(keyword, pageToken) {
+  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&pagetoken=' + pageToken + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
 
 	$.ajax({
 		url: "php/script.php",
 		type: "POST",
 		data: ({url: url}),
 		success: function(data) {
-      var results = JSON.parse(data);
-      console.log(results);
-
-      nextPage = results.next_page_token;
-
-      results = results.results;
-
-      for (var i = 0; i < results.length; i++) {
-        restaurantList[i] = new RestaurantInfo(results[i].place_id, results[i].geometry.location,
-          results[i].name, results[i].rating, results[i].price_level);
-
-        if (results[i].photos) {
-          restaurantList[i].RestaurantInfo = results[i].photos[0].html_attributions[0];
-        }
-      }
-      console.log(nextPage, restaurantList);
-
-      for (var i = 0; i < restaurantList.length; i++) {
-        createMarker(restaurantList[i]);
-      }
-
+      loadData(keyword, data);
     }
 	})
 }
 
 
+function loadData(keyword, data) {
+  var restaurantList = [];
+  var results = JSON.parse(data);
+  var pageToken = results.next_page_token;
+  results = results.results;
+
+  dataArray.push.apply( dataArray, results );
+
+  console.log(pageToken, results, dataArray);
+
+  if (pageToken) {
+    setTimeout(function() {
+      phpCall(keyword, pageToken);
+    }, 1000);
+  } else {
+    for (var i = 0; i < dataArray.length; i++) {
+      restaurantList[i] = new RestaurantInfo(dataArray[i].place_id, dataArray[i].geometry.location,
+        dataArray[i].name, dataArray[i].rating, dataArray[i].price_level);
+      if (dataArray[i].photos) {
+        restaurantList[i].RestaurantInfo = dataArray[i].photos[0].html_attributions[0];
+      }
+    }
+    for (var i = 0; i < restaurantList.length; i++) {
+      createMarker(restaurantList[i]);
+    }
+  }
+}
+
+
 // Google Maps API
 var searchBox = document.getElementById("search");
-var map, service, infoWindow, userQuery;
+var map, service, infoWindow;
 
 function initMap() {
   var center = new google.maps.LatLng(43.656758, -70.256169);
@@ -91,18 +99,7 @@ function initMap() {
 
   infoWindow = new google.maps.InfoWindow();
 
-  // service = new google.maps.places.PlacesService(map);
-  // service.nearbySearch(request, callback);
 }
-
-// function callback(results, status) {
-//   if (status == google.maps.places.PlacesServiceStatus.OK) {
-//     for (var i = 0; i < results.length; i++) {
-//       var place = results[i]
-//       createMarker(results[i]);
-//     }
-//   }
-// }
 
 function createMarker(place) {
   var location = place.location;
