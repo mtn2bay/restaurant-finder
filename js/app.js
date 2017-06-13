@@ -41,15 +41,14 @@ searchBox.addEventListener('keyup', function(event) {
 // jQuery to make AJAX call clean and simple
 function phpCall(keyword, pageToken) {
   var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&pagetoken=' + pageToken + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
-
-	$.ajax({
-		url: "php/script.php",
-		type: "POST",
-		data: ({url: url}),
-		success: function(data) {
+  $.ajax({
+    url: "php/script.php",
+    type: "POST",
+    data: ({url: url}),
+    success: function(data) {
       loadData(keyword, data);
     }
-	})
+  })
 }
 
 function loadData(keyword, data) {
@@ -61,7 +60,6 @@ function loadData(keyword, data) {
 
   //Push results from each page into master array
   dataArray.push.apply(dataArray, results);
-  console.log(results, dataArray);
 
   //Call PHP/API again if extra pages exist
   if (pageToken) {
