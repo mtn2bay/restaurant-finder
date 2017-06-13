@@ -92,7 +92,7 @@ function initMap() {
 
   map = new google.maps.Map(document.getElementById('map-container'), {
     center: center,
-    zoom: 17,
+    zoom: 16,
     disableDefaultUI: true
   });
 

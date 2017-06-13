@@ -64,7 +64,7 @@ input[type=text] {
   font-family: 'lato', sans-serif;
   font-size: 18px;
   color: #4A4A4A;
-  text-indent: 10px;
+  text-indent: 11px;
 }
 #map-container {
   position: absolute;
