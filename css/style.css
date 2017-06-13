@@ -1,3 +1,4 @@
+
 /*default font version*/
 @font-face {
   font-family: 'lato';
@@ -17,16 +18,6 @@
     format('truetype');
   font-weight: bold;
 }
-/*light font version*/
-@font-face {
-  font-family: 'lato';
-  src:
-    local('Lato light'),
-    Local('Lato-light'),
-    url('fonts/Lato-light.ttf')
-    format('truetype');
-  font-weight: 300;
-}
 html {
   height: 100%;
 }
@@ -44,10 +35,9 @@ body {
   z-index: 1;
   display: -webkit-flex;
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  height: 70px;
+  height: 90px;
   width: 100%;
   background-color: #0A4F87;
   opacity: 0.9;
@@ -62,11 +52,12 @@ body {
 input[type=text] {
   width: 270px;
   height: 40px;
+  margin: 5px 0 5px 15px;
   padding: 0;
+  background-color: #FFFFFF;
   background-image: url('img/mag-glass.png');
   background-repeat: no-repeat;
   background-position: 230px 3px;
-  background-color: #FFFFFF;
   opacity: 0.9;
   border: 1px #4A4A4A;
   border-radius: 2px;
@@ -75,13 +66,22 @@ input[type=text] {
   color: #4A4A4A;
   text-indent: 10px;
 }
-.right {
-  margin-left: auto;
-  margin-right: 19px;
-}
 #map-container {
   position: absolute;
   z-index: 0;
   height: 100%;
   width: 100%;
+}
+
+/* Screens over 600px wide */
+@media (min-width: 37.5em) {
+  #nav-bar {
+    flex-direction: row;
+    height: 70px;
+    align-items: center;
+  }
+  .right {
+    margin-left: auto;
+    margin-right: 19px;
+  }
 }

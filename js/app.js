@@ -1,6 +1,11 @@
+var searchBox = document.getElementById('search');
 var dataArray = [];
+var restaurantList = [];
+var markersArray = [];
+var map, infoWindow;
 
-// Constructor for data from Google Places API
+
+// Constructor to collect desired data from Google Places API
 function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.placeID = placeID;
   this.location = location;
@@ -10,31 +15,30 @@ function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.photo = photo;
 }
 
-
 // Text input functionality
-var searchBox = document.getElementById('search');
-
+// Clear placeholder on focus
 searchBox.addEventListener('focus', function(event) {
   event.target.setAttribute('placeholder', '');
 });
 searchBox.addEventListener('blur', function(event) {
   event.target.setAttribute('placeholder', 'e.g. Taqueria');
 });
-
+// Initialize search on enter key
 searchBox.addEventListener('keyup', function(event) {
   event.preventDefault();
   if (event.keyCode == 13) {
     var userQuery = this.value;
-
     this.value = '';
+    dataArray = [];
+    restaurantList = [];
+    clearMarkers();
     phpCall(userQuery, '');
-    activateMarkers = true;
   }
 });
 
-// AJAX call for PHP script
-// Recieve and parse data from Google Places API via PHP
-// Build an array of objects for each location
+// Send Google Places API endpoint to script.php
+// Recieve JSON data
+// jQuery to make AJAX call clean and simple
 function phpCall(keyword, pageToken) {
   var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&pagetoken=' + pageToken + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
 
@@ -48,22 +52,24 @@ function phpCall(keyword, pageToken) {
 	})
 }
 
-
 function loadData(keyword, data) {
-  var restaurantList = [];
+
+  //Parse JSON data
   var results = JSON.parse(data);
   var pageToken = results.next_page_token;
   results = results.results;
 
-  dataArray.push.apply( dataArray, results );
+  //Push results from each page into master array
+  dataArray.push.apply(dataArray, results);
+  console.log(results, dataArray);
 
-  console.log(pageToken, results, dataArray);
-
+  //Call PHP/API again if extra pages exist
   if (pageToken) {
     setTimeout(function() {
       phpCall(keyword, pageToken);
-    }, 1000);
+    }, 1500); // Need delay to allow additional pages to generate
   } else {
+    //Once data from all pages is received, create array of objects for each location
     for (var i = 0; i < dataArray.length; i++) {
       restaurantList[i] = new RestaurantInfo(dataArray[i].place_id, dataArray[i].geometry.location,
         dataArray[i].name, dataArray[i].rating, dataArray[i].price_level);
@@ -72,16 +78,13 @@ function loadData(keyword, data) {
       }
     }
     for (var i = 0; i < restaurantList.length; i++) {
+      //Create marker for each location
       createMarker(restaurantList[i]);
     }
   }
 }
 
-
 // Google Maps API
-var searchBox = document.getElementById("search");
-var map, service, infoWindow;
-
 function initMap() {
   var center = new google.maps.LatLng(43.656758, -70.256169);
 
@@ -91,14 +94,7 @@ function initMap() {
     disableDefaultUI: true
   });
 
-  var request = {
-    location: center,
-    radius: 8000,
-    types: ['restaurant']
-  };
-
   infoWindow = new google.maps.InfoWindow();
-
 }
 
 function createMarker(place) {
@@ -108,8 +104,18 @@ function createMarker(place) {
     position: location
   });
 
+  markersArray.push(marker); //Add markers to array to allow them to be cleared
+
+  //Open info window when marker is clicked
   google.maps.event.addListener(marker, 'click', function() {
     infoWindow.setContent(place.name);
     infoWindow.open(map, this);
   });
+}
+
+function clearMarkers() {
+  for (var i = 0; i < markersArray.length; i++ ) {
+    markersArray[i].setMap(null);
+  }
+  markersArray = [];
 }
