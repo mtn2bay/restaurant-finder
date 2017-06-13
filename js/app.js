@@ -46,7 +46,11 @@ function phpCall(keyword, pageToken) {
     type: "POST",
     data: ({url: url}),
     success: function(data) {
-      loadData(keyword, data);
+      if (data) {
+        loadData(keyword, data);
+      } else {
+        alert('No Results')
+      }
     }
   })
 }
