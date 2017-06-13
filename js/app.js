@@ -58,7 +58,7 @@ function loadData(keyword, data) {
   var results = JSON.parse(data);
   var pageToken = results.next_page_token;
   results = results.results;
-
+  
   //Push results from each page into master array
   dataArray.push.apply(dataArray, results);
   console.log(results, dataArray);
