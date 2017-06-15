@@ -4,7 +4,7 @@ var markersArray = [];
 var map, infoWindow;
 
 // Constructor to collect desired data from Google Places API
-function RestaurantInfo(placeID, location, name, rating, price, photo) {
+function RestaurantInfo(placeID, location, name) {
   this.placeID = placeID;
   this.location = location;
   this.name = name;
@@ -81,7 +81,7 @@ function loadPlaces(data) {
 
   for (let result of results) {
     restaurantList.push(new RestaurantInfo(result.place_id, result.geometry.location,
-      result.name, result.rating, result.price_level));
+      result.name));
   }
 
   for (let place of restaurantList) {
