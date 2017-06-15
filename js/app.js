@@ -1,39 +1,56 @@
 var searchBox = document.getElementById('search');
+var detailDiv = document.getElementById('place-details');
 var markersArray = [];
 var map, infoWindow;
-
 
 // Constructor to collect desired data from Google Places API
 function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.placeID = placeID;
   this.location = location;
   this.name = name;
-  this.rating = rating;
-  this.price = price;
 }
 
+// Constructor to collect desired data from Place Details request
+function PlaceDetails(name, hours, price, rating, reviews, address, website) {
+  this.name = name;
+  this.hours = hours;
+  this.price = price;
+  this.rating = rating;
+  this.reviews = reviews;
+  this.address = address;
+  this.website = website;
+}
 
-// Text input functionality
-// Clear placeholder on focus
+// Clear input placeholder on focus
 searchBox.addEventListener('focus', function(event) {
   event.target.setAttribute('placeholder', '');
 });
 searchBox.addEventListener('blur', function(event) {
   event.target.setAttribute('placeholder', 'e.g. Taqueria');
 });
+
 // Initialize search and clear old results on enter key
 searchBox.addEventListener('keyup', function(event) {
   event.preventDefault();
   if (event.keyCode == 13) {
     var userQuery = this.value;
     this.value = '';
-    loadData.results = [];
-    loadData.restaurantList = [];
+    loadPlaces.results = [];
+    loadPlaces.restaurantList = [];
     clearMarkers();
     getPlaces(userQuery);
   }
 });
 
+// Close details div if user clicks outside
+document.addEventListener('click', function(event) {
+  var isClick = detailDiv.contains(event.target);
+  if (!isClick) {
+    if (detailDiv.style.display === 'block') {
+      detailDiv.style.display = 'none';
+    }
+  }
+})
 
 // Send Google Places API endpoint to script.php
 // Recieve JSON data
@@ -48,7 +65,7 @@ function getPlaces(keyword) {
     data: ({url: url}),
     success: function(data) {
       if (data) {
-        loadData(data);
+        loadPlaces(data);
       } else {
         alert('No Results');
       }
@@ -56,9 +73,10 @@ function getPlaces(keyword) {
   })
 }
 
-function loadData(data) {
+// Process data from Google Places API
+function loadPlaces(data) {
   this.restaurantList = [];
-  this.results = JSON.parse(data); //Parse JSON data into object
+  this.results = JSON.parse(data);
   results = results.results;
 
   for (let result of results) {
@@ -67,12 +85,11 @@ function loadData(data) {
   }
 
   for (let place of restaurantList) {
-    //Create marker for each location
     createMarker(place);
   }
 }
 
-// Google Maps API
+// Initialize Google Maps API
 function initMap() {
   var center = new google.maps.LatLng(43.656758, -70.256169);
 
@@ -92,12 +109,12 @@ function createMarker(place) {
     position: location
   });
 
-  markersArray.push(marker); //Add markers to array to allow them to be cleared
+  markersArray.push(marker); // Add markers to array to allow them to be cleared
 
   var contentString = '<div>' + place.name + '</div>' +
     '<span id="no-link" name="' + place.placeID + '">MORE INFO</span>';
 
-  //Open info window when marker is clicked
+  // Open info window when marker is clicked
   google.maps.event.addListener(marker, 'click', function() {
     infoWindow.setContent(contentString);
     infoWindow.open(map, this);
@@ -116,6 +133,8 @@ function clearMarkers() {
   markersArray = [];
 }
 
+// Send Place Details request to script.php
+// Recieve JSON data
 function getDetails(placeID) {
   var url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid='
     + placeID + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
@@ -126,7 +145,7 @@ function getDetails(placeID) {
     data: ({url: url}),
     success: function(data) {
       if (data) {
-        showDetails(data)
+        loadDetails(data);
       } else {
         alert('No Results');
       }
@@ -134,16 +153,43 @@ function getDetails(placeID) {
   })
 }
 
-function showDetails(data) {
+// Process data from Place Details request
+function loadDetails(data) {
   this.results = JSON.parse(data);
   results = results.result;
-  console.log(results);
 
-  var detailDisplay = document.createElement('div');
-  detailDisplay.setAttribute('id', 'place-details');
-  var detailContent = document.createTextNode(results);
-  var content = document.getElementById('content');
+  var detailsObject = new PlaceDetails(results.name, results.opening_hours.weekday_text,
+    results.price_level, results.rating, results.reviews[0].text, results.vicinity, results.website);
 
-  detailDisplay.appendChild(detailContent);
-  content.appendChild(detailDisplay);
+  var detailsArray = Object.values(detailsObject);
+  printDetails(detailsArray);
+}
+
+// Output Place Details results to DOM
+function printDetails(detailsArray) {
+  document.getElementById('hours').innerHTML = '';
+
+  // Break up array of hours, create container for each day
+  for (day of detailsArray[1]) {
+    var placeDay = document.createElement('p');
+    var placeHours = document.createTextNode(day);
+    placeDay.appendChild(placeHours);
+    document.getElementById('hours').appendChild(placeDay);
+  }
+
+  document.getElementById('name').innerHTML = detailsArray[0];
+  document.getElementById('rating').innerHTML = detailsArray[3];
+  document.getElementById('reviews').innerHTML = detailsArray[4];
+  document.getElementById('address').innerHTML = detailsArray[5];
+
+  if (typeof detailsArray[2] !== 'undefined') {
+    document.getElementById('price').innerHTML = detailsArray[2];
+  }
+  if (typeof detailsArray[2] !== 'undefined') {
+    document.getElementById('website').innerHTML = '<a href="' + detailsArray[6] + '" target="_blank">' + detailsArray[6] + '</a>';
+  }
+  // Show details div
+  if (detailDiv.style.display === 'none') {
+    detailDiv.style.display = 'block';
+  }
 }
