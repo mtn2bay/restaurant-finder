@@ -1,6 +1,4 @@
 var searchBox = document.getElementById('search');
-var dataArray = [];
-var restaurantList = [];
 var markersArray = [];
 var map, infoWindow;
 
@@ -12,7 +10,6 @@ function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.name = name;
   this.rating = rating;
   this.price = price;
-  this.photo = photo;
 }
 
 // Text input functionality
@@ -23,66 +20,53 @@ searchBox.addEventListener('focus', function(event) {
 searchBox.addEventListener('blur', function(event) {
   event.target.setAttribute('placeholder', 'e.g. Taqueria');
 });
-// Initialize search on enter key
+// Initialize search and clear old results on enter key
 searchBox.addEventListener('keyup', function(event) {
   event.preventDefault();
   if (event.keyCode == 13) {
     var userQuery = this.value;
     this.value = '';
-    dataArray = [];
-    restaurantList = [];
+    loadData.results = [];
+    loadData.restaurantList = [];
     clearMarkers();
-    phpCall(userQuery, '');
+    phpCall(userQuery);
   }
 });
 
 // Send Google Places API endpoint to script.php
 // Recieve JSON data
 // jQuery to make AJAX call clean and simple
-function phpCall(keyword, pageToken) {
-  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword=' + keyword + '&pagetoken=' + pageToken + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
+function phpCall(keyword) {
+  var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword='
+    + keyword + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
+
   $.ajax({
     url: "php/script.php",
     type: "POST",
     data: ({url: url}),
     success: function(data) {
       if (data) {
-        loadData(keyword, data);
+        loadData(data);
       } else {
-        alert('No Results')
+        alert('No Results');
       }
     }
   })
 }
 
-function loadData(keyword, data) {
-
-  //Parse JSON data
-  var results = JSON.parse(data);
-  var pageToken = results.next_page_token;
+function loadData(data) {
+  this.restaurantList = [];
+  this.results = JSON.parse(data); //Parse JSON data into object
   results = results.results;
 
-  //Push results from each page into master array
-  dataArray.push.apply(dataArray, results);
+  for (let result of results) {
+    restaurantList.push(new RestaurantInfo(result.place_id, result.geometry.location,
+      result.name, result.rating, result.price_level));
+  }
 
-  //Call PHP/API again if extra pages exist
-  if (pageToken) {
-    setTimeout(function() {
-      phpCall(keyword, pageToken);
-    }, 1500); // Need delay to allow additional pages to generate
-  } else {
-    //Once data from all pages is received, create array of objects for each location
-    for (var i = 0; i < dataArray.length; i++) {
-      restaurantList[i] = new RestaurantInfo(dataArray[i].place_id, dataArray[i].geometry.location,
-        dataArray[i].name, dataArray[i].rating, dataArray[i].price_level);
-      if (dataArray[i].photos) {
-        restaurantList[i].RestaurantInfo = dataArray[i].photos[0].html_attributions[0];
-      }
-    }
-    for (var i = 0; i < restaurantList.length; i++) {
-      //Create marker for each location
-      createMarker(restaurantList[i]);
-    }
+  for (let place of restaurantList) {
+    //Create marker for each location
+    createMarker(place);
   }
 }
 
@@ -116,8 +100,8 @@ function createMarker(place) {
 }
 
 function clearMarkers() {
-  for (var i = 0; i < markersArray.length; i++ ) {
-    markersArray[i].setMap(null);
+  for (let marker of markersArray) {
+    marker.setMap(null);
   }
   markersArray = [];
 }
