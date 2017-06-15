@@ -93,7 +93,7 @@ input[type=text] {
 #place-details {
   position: absolute;
   z-index: 1;
-  margin: 90px 20px;
+  margin: 120px 30px 30px 30px;
   padding: 15px;
   background: #616161;
   opacity: .9;
@@ -112,13 +112,16 @@ input[type=text] {
 }
 /* Screens over 600px wide */
 @media (min-width: 37.5em) {
+  .right {
+    margin-left: auto;
+    margin-right: 19px;
+  }
   #nav-bar {
     flex-direction: row;
     height: 70px;
     align-items: center;
   }
-  .right {
-    margin-left: auto;
-    margin-right: 19px;
+  #place-details {
+    margin: 90px 20px;
   }
 }
