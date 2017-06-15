@@ -56,7 +56,6 @@ function phpCall(keyword) {
 
 function loadData(data) {
   this.restaurantList = [];
-
   this.results = JSON.parse(data); //Parse JSON data into object
   results = results.results;
 
