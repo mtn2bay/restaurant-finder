@@ -170,7 +170,7 @@ function printDetails(detailsArray) {
   document.getElementById('hours').innerHTML = '';
 
   // Break up array of hours, create container for each day
-  for (day of detailsArray[1]) {
+  for (let day of detailsArray[1]) {
     var placeDay = document.createElement('p');
     var placeHours = document.createTextNode(day);
     placeDay.appendChild(placeHours);
