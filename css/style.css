@@ -26,13 +26,13 @@ body {
   margin: 0;
   font-family: 'lato', sans-serif;
 }
-.content {
+#content {
   position: relative;
   height: 100%;
 }
 #nav-bar {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   display: -webkit-flex;
   display: flex;
   flex-direction: column;
@@ -71,6 +71,29 @@ input[type=text] {
   z-index: 0;
   height: 100%;
   width: 100%;
+}
+#no-link {
+  margin-top: 5px;
+  color: blue;
+  cursor: pointer;
+}
+#no-link:hover {
+  text-decoration: underline;
+}
+#place-details {
+  position: absolute;
+  z-index: 1;
+  margin: 100px auto;
+  top: 0; right: 0; bottom: 0; left: 0;
+  height: 500px;
+  width: 500px;
+  background: grey;
+  opacity: .7;
+  border: 1px solid #4A4A4A;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px #4A4A4A;
+  font-family: 'lato', sans-serif;
+  font-size: 18px;
 }
 
 /* Screens over 600px wide */

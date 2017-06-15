@@ -12,6 +12,7 @@ function RestaurantInfo(placeID, location, name, rating, price, photo) {
   this.price = price;
 }
 
+
 // Text input functionality
 // Clear placeholder on focus
 searchBox.addEventListener('focus', function(event) {
@@ -29,14 +30,15 @@ searchBox.addEventListener('keyup', function(event) {
     loadData.results = [];
     loadData.restaurantList = [];
     clearMarkers();
-    phpCall(userQuery);
+    getPlaces(userQuery);
   }
 });
+
 
 // Send Google Places API endpoint to script.php
 // Recieve JSON data
 // jQuery to make AJAX call clean and simple
-function phpCall(keyword) {
+function getPlaces(keyword) {
   var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=43.656758,-70.256169&radius=1200&type=restaurant&keyword='
     + keyword + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
 
@@ -92,11 +94,19 @@ function createMarker(place) {
 
   markersArray.push(marker); //Add markers to array to allow them to be cleared
 
+  var contentString = '<div>' + place.name + '</div>' +
+    '<span id="no-link" name="' + place.placeID + '">MORE INFO</span>';
+
   //Open info window when marker is clicked
   google.maps.event.addListener(marker, 'click', function() {
-    infoWindow.setContent(place.name);
+    infoWindow.setContent(contentString);
     infoWindow.open(map, this);
-  });
+    document.getElementById('no-link').addEventListener('click', function() {
+      var placeID = this.getAttribute('name');
+      getDetails(placeID);
+    })
+  })
+
 }
 
 function clearMarkers() {
@@ -104,4 +114,36 @@ function clearMarkers() {
     marker.setMap(null);
   }
   markersArray = [];
+}
+
+function getDetails(placeID) {
+  var url = 'https://maps.googleapis.com/maps/api/place/details/json?placeid='
+    + placeID + '&key=AIzaSyDordTGObTW8WRPHFTrCGwLo3PUlorSszs';
+
+  $.ajax({
+    url: "php/script.php",
+    type: "POST",
+    data: ({url: url}),
+    success: function(data) {
+      if (data) {
+        showDetails(data)
+      } else {
+        alert('No Results');
+      }
+    }
+  })
+}
+
+function showDetails(data) {
+  this.results = JSON.parse(data);
+  results = results.result;
+  console.log(results);
+
+  var detailDisplay = document.createElement('div');
+  detailDisplay.setAttribute('id', 'place-details');
+  var detailContent = document.createTextNode(results);
+  var content = document.getElementById('content');
+
+  detailDisplay.appendChild(detailContent);
+  content.appendChild(detailDisplay);
 }
