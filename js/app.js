@@ -20,7 +20,7 @@ searchBox.addEventListener('focus', function(event) {
 searchBox.addEventListener('blur', function(event) {
   event.target.setAttribute('placeholder', 'e.g. Taqueria');
 });
-// Initialize search on enter key
+// Initialize search and clear old results on enter key
 searchBox.addEventListener('keyup', function(event) {
   event.preventDefault();
   if (event.keyCode == 13) {
@@ -44,7 +44,7 @@ function phpCall(keyword) {
     url: "php/script.php",
     type: "POST",
     data: ({url: url}),
-    success: data => {
+    success: function(data) {
       if (data) {
         loadData(data);
       } else {
@@ -56,7 +56,8 @@ function phpCall(keyword) {
 
 function loadData(data) {
   this.restaurantList = [];
-  this.results = JSON.parse(data); //Parse JSON into Object
+
+  this.results = JSON.parse(data); //Parse JSON data into object
   results = results.results;
 
   for (let result of results) {
