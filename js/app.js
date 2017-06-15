@@ -89,50 +89,6 @@ function loadPlaces(data) {
   }
 }
 
-// Initialize Google Maps API
-function initMap() {
-  var center = new google.maps.LatLng(43.656758, -70.256169);
-
-  map = new google.maps.Map(document.getElementById('map-container'), {
-    center: center,
-    zoom: 16,
-    disableDefaultUI: true
-  });
-
-  infoWindow = new google.maps.InfoWindow();
-}
-
-function createMarker(place) {
-  var location = place.location;
-  var marker = new google.maps.Marker({
-    map: map,
-    position: location
-  });
-
-  markersArray.push(marker); // Add markers to array to allow them to be cleared
-
-  var contentString = '<div>' + place.name + '</div>' +
-    '<span id="no-link" name="' + place.placeID + '">MORE INFO</span>';
-
-  // Open info window when marker is clicked
-  google.maps.event.addListener(marker, 'click', function() {
-    infoWindow.setContent(contentString);
-    infoWindow.open(map, this);
-    document.getElementById('no-link').addEventListener('click', function() {
-      var placeID = this.getAttribute('name');
-      getDetails(placeID);
-    })
-  })
-
-}
-
-function clearMarkers() {
-  for (let marker of markersArray) {
-    marker.setMap(null);
-  }
-  markersArray = [];
-}
-
 // Send Place Details request to script.php
 // Recieve JSON data
 function getDetails(placeID) {
@@ -192,4 +148,48 @@ function printDetails(detailsArray) {
   if (detailDiv.style.display === 'none') {
     detailDiv.style.display = 'block';
   }
+}
+
+// Initialize Google Maps API
+function initMap() {
+  var center = new google.maps.LatLng(43.656758, -70.256169);
+
+  map = new google.maps.Map(document.getElementById('map-container'), {
+    center: center,
+    zoom: 16,
+    disableDefaultUI: true
+  });
+
+  infoWindow = new google.maps.InfoWindow();
+}
+
+function createMarker(place) {
+  var location = place.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: location
+  });
+
+  markersArray.push(marker); // Add markers to array to allow them to be cleared
+
+  var contentString = '<div>' + place.name + '</div>' +
+    '<span id="no-link" name="' + place.placeID + '">MORE INFO</span>';
+
+  // Open info window when marker is clicked
+  google.maps.event.addListener(marker, 'click', function() {
+    infoWindow.setContent(contentString);
+    infoWindow.open(map, this);
+    document.getElementById('no-link').addEventListener('click', function() {
+      var placeID = this.getAttribute('name');
+      getDetails(placeID);
+    })
+  })
+
+}
+
+function clearMarkers() {
+  for (let marker of markersArray) {
+    marker.setMap(null);
+  }
+  markersArray = [];
 }
