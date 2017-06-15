@@ -4,7 +4,7 @@ var markersArray = [];
 var map, infoWindow;
 
 // Constructor to collect desired data from Google Places API
-function RestaurantInfo(placeID, location, name) {
+function PlaceInfo(placeID, location, name) {
   this.placeID = placeID;
   this.location = location;
   this.name = name;
@@ -36,7 +36,7 @@ searchBox.addEventListener('keyup', function(event) {
     var userQuery = this.value;
     this.value = '';
     loadPlaces.results = [];
-    loadPlaces.restaurantList = [];
+    loadPlaces.placesList = [];
     clearMarkers();
     getPlaces(userQuery);
   }
@@ -75,16 +75,16 @@ function getPlaces(keyword) {
 
 // Process data from Google Places API
 function loadPlaces(data) {
-  this.restaurantList = [];
+  this.placesList = [];
   this.results = JSON.parse(data);
   results = results.results;
 
   for (let result of results) {
-    restaurantList.push(new RestaurantInfo(result.place_id, result.geometry.location,
+    placesList.push(new PlaceInfo(result.place_id, result.geometry.location,
       result.name));
   }
 
-  for (let place of restaurantList) {
+  for (let place of placesList) {
     createMarker(place);
   }
 }
@@ -173,18 +173,18 @@ function createMarker(place) {
   markersArray.push(marker); // Add markers to array to allow them to be cleared
 
   var contentString = '<div>' + place.name + '</div>' +
-    '<span id="no-link" name="' + place.placeID + '">MORE INFO</span>';
+    '<span id="no-link" placeID="' + place.placeID + '">MORE INFO</span>';
 
-  // Open info window when marker is clicked
+  // Open infoWindow when marker is clicked
   google.maps.event.addListener(marker, 'click', function() {
     infoWindow.setContent(contentString);
     infoWindow.open(map, this);
+    // Add 'more info' event listener when infoWindow opens
     document.getElementById('no-link').addEventListener('click', function() {
-      var placeID = this.getAttribute('name');
+      var placeID = this.getAttribute('placeID');
       getDetails(placeID);
     })
   })
-
 }
 
 function clearMarkers() {
